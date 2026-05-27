@@ -1,23 +1,10 @@
-package com.example.demo.entity;
+package com.example.demo.dto;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Entity
-@Table(name = "libros")
-public class Libro {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class LibroRequest {
 
     @NotBlank
     private String titulo;
@@ -31,18 +18,6 @@ public class Libro {
     @NotNull
     @Min(0)
     private Integer stock;
-
-    @ManyToOne
-    @JoinColumn(name = "prestamo_id")
-    private Prestamo prestamo;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getTitulo() {
         return titulo;
@@ -74,13 +49,5 @@ public class Libro {
 
     public void setStock(Integer stock) {
         this.stock = stock;
-    }
-
-    public Prestamo getPrestamo() {
-        return prestamo;
-    }
-
-    public void setPrestamo(Prestamo prestamo) {
-        this.prestamo = prestamo;
     }
 }
