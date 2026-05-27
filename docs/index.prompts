@@ -1,0 +1,9 @@
+@backend: Crear, mantener y ejecutar la aplicacion backend Java/Spring Boot -> docs/agents/backend.agent.md
+@database: Disenar y poblar la base de datos -> docs/agents/database.agent.md
+@api-contract: Definir el contrato REST entre backend y frontend -> docs/agents/api-contract.agent.md
+@testing: Ejecutar pruebas JUnit y comprobaciones REST -> docs/agents/testing.agent.md
+@front-connector: Conectar Angular con el backend -> docs/agents/front-connector.agent.md
+@deploy: Construir y empaquetar el proyecto -> docs/agents/deploy.agent.md
+@debug: Analizar y resolver errores -> docs/agents/debug.agent.md
+@documentation: Generar y revisar documentacion -> docs/agents/documentation.agent.md
+@security-auth: Implementar autenticacion y seguridad cuando se requiera -> docs/agents/security-auth.agent.md
