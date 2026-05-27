@@ -1,0 +1,86 @@
+<section class="catalog-page">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Catalogo</p>
+      <h1>Libros disponibles</h1>
+    </div>
+    <a class="primary-link" routerLink="/libros/nuevo">Crear libro</a>
+  </div>
+
+  <section class="filters" aria-label="Datos para buscar y alquilar">
+    <label>
+      Buscar
+      <input
+        type="search"
+        placeholder="Titulo, autor o ISBN"
+        [value]="searchText()"
+        (input)="updateSearch($event)"
+      >
+    </label>
+
+    <label>
+      Nombre del lector
+      <input
+        type="text"
+        placeholder="Necesario para alquilar"
+        [value]="borrowerName()"
+        (input)="updateBorrowerName($event)"
+      >
+    </label>
+  </section>
+
+  @if (message()) {
+    <p class="notice">{{ message() }}</p>
+  }
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="empty">Cargando libros...</p>
+  } @else if (filteredBooks().length === 0) {
+    <p class="empty">No hay libros que coincidan con el filtro.</p>
+  } @else {
+    <div class="book-grid">
+      @for (book of filteredBooks(); track book.id) {
+        <article class="book-card">
+          <div class="book-main">
+            <span class="status">{{ activeLoanFor(book) ? 'PRESTADO' : 'DISPONIBLE' }}</span>
+            <h2>{{ book.titulo }}</h2>
+            <p class="author">{{ book.autor }}</p>
+            <p>ISBN: {{ book.isbn }}</p>
+          </div>
+
+          <dl>
+            <div>
+              <dt>Stock</dt>
+              <dd>{{ book.stock }}</dd>
+            </div>
+            @if (activeLoanFor(book); as loan) {
+              <div>
+                <dt>Lector actual</dt>
+                <dd>{{ loan.nombreLector }}</dd>
+              </div>
+            }
+          </dl>
+
+          <div class="actions">
+            <a routerLink="/libros/{{ book.id }}">Detalle</a>
+            <button
+              type="button"
+              (click)="rent(book)"
+              [disabled]="book.stock === 0 || !!activeLoanFor(book) || actionBookId() === book.id"
+            >
+              Alquilar
+            </button>
+            @if (activeLoanFor(book)) {
+              <button type="button" (click)="returnBook(book)" [disabled]="actionBookId() === book.id">
+                Devolver
+              </button>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,50 @@
+<section class="form-page">
+  <a class="back" routerLink="/libros">Volver al catalogo</a>
+
+  <div class="page-heading">
+    <p class="eyebrow">Nuevo libro</p>
+    <h1>Crear libro</h1>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <label>
+      Titulo
+      <input type="text" formControlName="titulo">
+      @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
+        <span>Escribe al menos 3 caracteres.</span>
+      }
+    </label>
+
+    <label>
+      Autor
+      <input type="text" formControlName="autor">
+      @if (form.controls.autor.touched && form.controls.autor.invalid) {
+        <span>Escribe al menos 3 caracteres.</span>
+      }
+    </label>
+
+    <label>
+      Stock
+      <input type="number" min="0" step="1" formControlName="stock">
+    </label>
+
+    <label class="wide">
+      ISBN
+      <input type="text" formControlName="isbn">
+      @if (form.controls.isbn.touched && form.controls.isbn.invalid) {
+        <span>Escribe un ISBN valido.</span>
+      }
+    </label>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <div class="actions">
+      <button type="submit" [disabled]="saving()">
+        {{ saving() ? 'Guardando...' : 'Guardar libro' }}
+      </button>
+      <a routerLink="/libros">Cancelar</a>
+    </div>
+  </form>
+</section>
