@@ -24,29 +24,15 @@
     </label>
 
     <label>
-      Categoria
-      <select formControlName="categoriaId">
-        @for (category of categories(); track category.id) {
-          <option [value]="category.id">{{ category.nombre }}</option>
-        }
-      </select>
-    </label>
-
-    <label>
-      Precio
-      <input type="number" min="0.01" step="0.01" formControlName="precio">
-    </label>
-
-    <label>
       Stock
       <input type="number" min="0" step="1" formControlName="stock">
     </label>
 
     <label class="wide">
-      Descripcion
-      <textarea rows="5" formControlName="descripcion"></textarea>
-      @if (form.controls.descripcion.touched && form.controls.descripcion.invalid) {
-        <span>Escribe al menos 10 caracteres.</span>
+      ISBN
+      <input type="text" formControlName="isbn">
+      @if (form.controls.isbn.touched && form.controls.isbn.invalid) {
+        <span>Escribe un ISBN valido.</span>
       }
     </label>
 

@@ -1,29 +1,29 @@
-export type BookStatus = 'DISPONIBLE' | 'RESERVADO' | 'VENDIDO' | 'PRESTADO';
-
-export interface Category {
-  id: number;
-  nombre: string;
-  descripcion: string;
-}
-
 export interface Book {
   id: number;
   titulo: string;
   autor: string;
-  descripcion: string;
-  precio: number;
+  isbn: string;
   stock: number;
-  estado: BookStatus;
-  categoriaId: number;
-  categoriaNombre: string;
+  prestamoId: number | null;
 }
 
 export interface CreateBookRequest {
   titulo: string;
   autor: string;
-  descripcion: string;
-  precio: number;
+  isbn: string;
   stock: number;
-  categoriaId: number;
 }
 
+export interface CreateLoanRequest {
+  nombreLector: string;
+  libroIds: number[];
+}
+
+export interface Loan {
+  id: number;
+  nombreLector: string;
+  fechaPrestamo: string;
+  fechaDevolucion: string | null;
+  estado: 'ACTIVO' | 'DEVUELTO';
+  libros: Book[];
+}

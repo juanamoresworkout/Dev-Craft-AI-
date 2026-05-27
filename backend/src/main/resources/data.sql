@@ -15,3 +15,6 @@ VALUES (3, 'Nada', 'Carmen Laforet', '9788423342478', 1, 2);
 
 INSERT INTO libros (id, titulo, autor, isbn, stock, prestamo_id)
 VALUES (4, 'Patria', 'Fernando Aramburu', '9788490663196', 5, NULL);
+
+ALTER TABLE prestamos ALTER COLUMN id RESTART WITH 3;
+ALTER TABLE libros ALTER COLUMN id RESTART WITH 5;

@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 
 import { LibraryService } from '../../core/services/library.service';
-import { Book, Category } from '../../models/book';
+import { Book, Loan } from '../../models/book';
 
 @Component({
   selector: 'app-book-catalog',
@@ -14,22 +14,22 @@ import { Book, Category } from '../../models/book';
 })
 export class BookCatalog implements OnInit {
   protected readonly books = signal<Book[]>([]);
-  protected readonly categories = signal<Category[]>([]);
-  protected readonly selectedCategoryId = signal<number | 'all'>('all');
+  protected readonly loans = signal<Loan[]>([]);
   protected readonly searchText = signal('');
+  protected readonly borrowerName = signal('');
   protected readonly loading = signal(false);
+  protected readonly actionBookId = signal<number | null>(null);
   protected readonly message = signal('');
+  protected readonly error = signal('');
 
   protected readonly filteredBooks = computed(() => {
     const term = this.searchText().trim().toLowerCase();
-    const categoryId = this.selectedCategoryId();
-    return this.books().filter((book) => {
-      const matchesCategory = categoryId === 'all' || book.categoriaId === categoryId;
-      const matchesText = !term ||
-        book.titulo.toLowerCase().includes(term) ||
-        book.autor.toLowerCase().includes(term);
-      return matchesCategory && matchesText;
-    });
+    return this.books().filter((book) =>
+      !term ||
+      book.titulo.toLowerCase().includes(term) ||
+      book.autor.toLowerCase().includes(term) ||
+      book.isbn.toLowerCase().includes(term)
+    );
   });
 
   constructor(private readonly libraryService: LibraryService) {}
@@ -42,43 +42,64 @@ export class BookCatalog implements OnInit {
     this.searchText.set((event.target as HTMLInputElement).value);
   }
 
-  protected updateCategory(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    this.selectedCategoryId.set(value === 'all' ? 'all' : Number(value));
+  protected updateBorrowerName(event: Event): void {
+    this.borrowerName.set((event.target as HTMLInputElement).value);
   }
 
-  protected reserve(book: Book): void {
-    this.libraryService.reserveBook(book.id).subscribe((updated) => {
-      this.applyBookUpdate(updated, 'Libro reservado correctamente.');
-    });
+  protected activeLoanFor(book: Book): Loan | undefined {
+    return this.loans().find((loan) =>
+      loan.estado === 'ACTIVO' && loan.libros.some((item) => item.id === book.id)
+    );
   }
 
-  protected buy(book: Book): void {
-    this.libraryService.buyBook(book.id).subscribe((updated) => {
-      this.applyBookUpdate(updated, 'Compra registrada correctamente.');
-    });
+  protected rent(book: Book): void {
+    const nombreLector = this.borrowerName().trim();
+    if (!nombreLector) {
+      this.error.set('Escribe el nombre del lector antes de alquilar.');
+      return;
+    }
+
+    this.actionBookId.set(book.id);
+    this.error.set('');
+    this.libraryService.rentBook(book.id, nombreLector)
+      .pipe(finalize(() => this.actionBookId.set(null)))
+      .subscribe({
+        next: () => this.loadData('Prestamo registrado correctamente.'),
+        error: () => this.error.set('No se pudo alquilar el libro. Comprueba que tiene stock disponible.')
+      });
   }
 
   protected returnBook(book: Book): void {
-    this.libraryService.returnBook(book.id).subscribe((updated) => {
-      this.applyBookUpdate(updated, 'Devolucion registrada correctamente.');
-    });
-  }
-
-  private loadData(): void {
-    this.loading.set(true);
-    this.libraryService.getCategories().subscribe((categories) => this.categories.set(categories));
-    this.libraryService.getBooks()
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe((books) => this.books.set(books));
-  }
-
-  private applyBookUpdate(updated: Book | undefined, message: string): void {
-    if (!updated) {
-      this.message.set('No se pudo actualizar el libro.');
+    const loan = this.activeLoanFor(book);
+    if (!loan) {
       return;
     }
-    this.books.update((books) => books.map((book) => book.id === updated.id ? updated : book));
-    this.message.set(message);
+
+    this.actionBookId.set(book.id);
+    this.error.set('');
+    this.libraryService.returnLoan(loan.id)
+      .pipe(finalize(() => this.actionBookId.set(null)))
+      .subscribe({
+        next: () => this.loadData('Devolucion registrada correctamente.'),
+        error: () => this.error.set('No se pudo devolver el prestamo.')
+      });
+  }
+
+  private loadData(successMessage = ''): void {
+    this.loading.set(true);
+    forkJoin({
+      books: this.libraryService.getBooks(),
+      loans: this.libraryService.getLoans()
+    })
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: ({ books, loans }) => {
+          this.books.set(books);
+          this.loans.set(loans);
+          this.message.set(successMessage);
+          this.error.set('');
+        },
+        error: () => this.error.set('No se ha podido conectar con el backend.')
+      });
   }
 }

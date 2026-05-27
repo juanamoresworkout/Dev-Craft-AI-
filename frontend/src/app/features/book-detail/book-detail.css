@@ -70,9 +70,30 @@ button:disabled {
   opacity: 0.45;
 }
 
+.borrower {
+  display: grid;
+  gap: 0.35rem;
+  max-width: 360px;
+  color: #35506f;
+  font-weight: 700;
+}
+
+.borrower input {
+  padding: 0.7rem;
+  border: 1px solid #bdcbe0;
+  border-radius: 0.45rem;
+  font: inherit;
+}
+
 .notice,
+.error,
 .empty {
   padding: 1rem;
   border-radius: 0.5rem;
   background: #e8f6f2;
+}
+
+.error {
+  background: #fee4e2;
+  color: #b42318;
 }

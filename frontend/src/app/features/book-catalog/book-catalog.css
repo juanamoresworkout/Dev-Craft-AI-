@@ -74,10 +74,16 @@ select {
 }
 
 .notice,
+.error,
 .empty {
   padding: 1rem;
   border-radius: 0.5rem;
   background: #e8f6f2;
+}
+
+.error {
+  background: #fee4e2;
+  color: #b42318;
 }
 
 .book-grid {
