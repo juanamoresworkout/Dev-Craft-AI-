@@ -1,0 +1,41 @@
+<section class="detail-page">
+  <a class="back" routerLink="/libros">Volver al catalogo</a>
+
+  @if (book(); as item) {
+    <article class="detail">
+      <div>
+        <p class="eyebrow">{{ item.categoriaNombre }}</p>
+        <h1>{{ item.titulo }}</h1>
+        <p class="author">{{ item.autor }}</p>
+        <p>{{ item.descripcion }}</p>
+      </div>
+
+      <dl>
+        <div>
+          <dt>Estado</dt>
+          <dd>{{ item.estado }}</dd>
+        </div>
+        <div>
+          <dt>Precio</dt>
+          <dd>{{ item.precio | currency:'EUR' }}</dd>
+        </div>
+        <div>
+          <dt>Stock</dt>
+          <dd>{{ item.stock }}</dd>
+        </div>
+      </dl>
+
+      @if (message()) {
+        <p class="notice">{{ message() }}</p>
+      }
+
+      <div class="actions">
+        <button type="button" (click)="reserve()" [disabled]="item.estado === 'RESERVADO'">Reservar</button>
+        <button type="button" (click)="buy()" [disabled]="item.stock === 0">Comprar</button>
+        <button type="button" (click)="returnBook()">Devolver</button>
+      </div>
+    </article>
+  } @else {
+    <p class="empty">No se ha encontrado el libro.</p>
+  }
+</section>

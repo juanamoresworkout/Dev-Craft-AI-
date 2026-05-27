@@ -1,0 +1,76 @@
+<section class="catalog-page">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Catalogo</p>
+      <h1>Libros disponibles</h1>
+    </div>
+    <a class="primary-link" routerLink="/libros/nuevo">Crear libro</a>
+  </div>
+
+  <section class="filters" aria-label="Filtros del catalogo">
+    <label>
+      Buscar
+      <input
+        type="search"
+        placeholder="Titulo o autor"
+        [value]="searchText()"
+        (input)="updateSearch($event)"
+      >
+    </label>
+
+    <label>
+      Categoria
+      <select [value]="selectedCategoryId()" (change)="updateCategory($event)">
+        <option value="all">Todas</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.nombre }}</option>
+        }
+      </select>
+    </label>
+  </section>
+
+  @if (message()) {
+    <p class="notice">{{ message() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="empty">Cargando libros...</p>
+  } @else if (filteredBooks().length === 0) {
+    <p class="empty">No hay libros que coincidan con el filtro.</p>
+  } @else {
+    <div class="book-grid">
+      @for (book of filteredBooks(); track book.id) {
+        <article class="book-card">
+          <div class="book-main">
+            <span class="status">{{ book.estado }}</span>
+            <h2>{{ book.titulo }}</h2>
+            <p class="author">{{ book.autor }}</p>
+            <p>{{ book.descripcion }}</p>
+          </div>
+
+          <dl>
+            <div>
+              <dt>Categoria</dt>
+              <dd>{{ book.categoriaNombre }}</dd>
+            </div>
+            <div>
+              <dt>Precio</dt>
+              <dd>{{ book.precio | currency:'EUR' }}</dd>
+            </div>
+            <div>
+              <dt>Stock</dt>
+              <dd>{{ book.stock }}</dd>
+            </div>
+          </dl>
+
+          <div class="actions">
+            <a routerLink="/libros/{{ book.id }}">Detalle</a>
+            <button type="button" (click)="reserve(book)" [disabled]="book.estado === 'RESERVADO'">Reservar</button>
+            <button type="button" (click)="buy(book)" [disabled]="book.stock === 0">Comprar</button>
+            <button type="button" (click)="returnBook(book)">Devolver</button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
