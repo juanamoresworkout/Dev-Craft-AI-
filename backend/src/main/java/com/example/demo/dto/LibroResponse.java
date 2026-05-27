@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+// Formato publico que devuelve la API para un libro.
 public class LibroResponse {
 
     private Long id;

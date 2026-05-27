@@ -32,12 +32,14 @@ public class PrestamoService {
     }
 
     public Prestamo buscarPorId(Long id) {
+        // Unifica el error 404 para cualquier operacion sobre prestamos.
         return prestamoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Prestamo no encontrado"));
     }
 
     @Transactional
     public Prestamo prestar(PrestarRequest request) {
+        // La transaccion asegura que se cree el prestamo y se descuenten todos los stocks juntos.
         Prestamo prestamo = new Prestamo();
         prestamo.setNombreLector(request.getNombreLector());
         prestamo.setFechaPrestamo(LocalDate.now());
@@ -46,6 +48,7 @@ public class PrestamoService {
 
         List<Libro> libros = new ArrayList<Libro>();
         for (Long libroId : request.getLibroIds()) {
+            // Cada libro debe existir, tener stock y no estar en otro prestamo activo.
             Libro libro = buscarLibroDisponible(libroId);
             libro.setStock(libro.getStock() - 1);
             libro.setPrestamo(guardado);
@@ -58,10 +61,12 @@ public class PrestamoService {
     @Transactional
     public Prestamo devolver(Long id) {
         Prestamo prestamo = buscarPorId(id);
+        // Solo los prestamos activos pueden devolverse; los devueltos no deben sumar stock dos veces.
         if (!ACTIVO.equals(prestamo.getEstado())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El prestamo ya esta devuelto");
         }
         for (Libro libro : prestamo.getLibros()) {
+            // Al devolver, cada libro recupera una unidad de stock.
             libro.setStock(libro.getStock() + 1);
             libroRepository.save(libro);
         }
@@ -72,10 +77,12 @@ public class PrestamoService {
 
     public void eliminar(Long id) {
         Prestamo prestamo = buscarPorId(id);
+        // No se elimina un prestamo activo para no perder la trazabilidad de libros prestados.
         if (ACTIVO.equals(prestamo.getEstado())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar un prestamo activo");
         }
         for (Libro libro : prestamo.getLibros()) {
+            // Antes de borrar el prestamo se rompe la clave foranea desde libros.
             libro.setPrestamo(null);
             libroRepository.save(libro);
         }
@@ -83,6 +90,7 @@ public class PrestamoService {
     }
 
     private Libro buscarLibroDisponible(Long id) {
+        // Aplica todas las reglas que determinan si un libro puede prestarse.
         Libro libro = libroRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Libro no encontrado"));
         if (libro.getStock() <= 0) {

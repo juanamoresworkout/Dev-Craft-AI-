@@ -30,6 +30,7 @@ public class LibroController {
 
     @GetMapping
     public List<LibroResponse> listar() {
+        // Convierte las entidades JPA a DTOs para no exponer relaciones internas.
         List<LibroResponse> respuestas = new ArrayList<LibroResponse>();
         for (Libro libro : libroService.listar()) {
             respuestas.add(toResponse(libro));
@@ -60,6 +61,7 @@ public class LibroController {
     }
 
     public static LibroResponse toResponse(Libro libro) {
+        // Centraliza el formato JSON de libro usado por los controladores.
         LibroResponse response = new LibroResponse();
         response.setId(libro.getId());
         response.setTitulo(libro.getTitulo());

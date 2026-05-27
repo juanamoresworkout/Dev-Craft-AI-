@@ -32,6 +32,7 @@ public class Libro {
     @Min(0)
     private Integer stock;
 
+    // Relacion opcional: null significa que el libro no esta asociado a ningun prestamo.
     @ManyToOne
     @JoinColumn(name = "prestamo_id")
     private Prestamo prestamo;

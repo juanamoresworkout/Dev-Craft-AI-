@@ -30,6 +30,7 @@ export class BookForm {
   ) {}
 
   protected submit(): void {
+    // Fuerza la visualizacion de errores antes de enviar datos incompletos al backend.
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.error.set('Revisa los campos obligatorios antes de guardar.');
@@ -38,6 +39,7 @@ export class BookForm {
 
     this.saving.set(true);
     this.error.set('');
+    // Si la creacion funciona, lleva al usuario directamente al detalle del nuevo libro.
     this.libraryService.createBook(this.form.getRawValue()).subscribe({
       next: (book) => this.router.navigate(['/libros', book.id]),
       error: () => {

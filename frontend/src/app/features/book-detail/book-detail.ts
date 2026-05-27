@@ -21,6 +21,7 @@ export class BookDetail implements OnInit {
   protected readonly error = signal('');
 
   protected readonly activeLoan = computed(() => {
+    // Calcula el prestamo activo del libro mostrado sin duplicar estado manual.
     const current = this.book();
     if (!current) {
       return undefined;
@@ -48,6 +49,7 @@ export class BookDetail implements OnInit {
   }
 
   protected rent(): void {
+    // La pantalla de detalle presta siempre el libro de la ruta actual.
     const nombreLector = this.borrowerName().trim();
     if (!nombreLector) {
       this.error.set('Escribe el nombre del lector antes de alquilar.');
@@ -65,6 +67,7 @@ export class BookDetail implements OnInit {
   }
 
   protected returnBook(): void {
+    // Solo se puede devolver si el libro tiene un prestamo activo asociado.
     const loan = this.activeLoan();
     if (!loan) {
       return;
@@ -81,6 +84,7 @@ export class BookDetail implements OnInit {
   }
 
   private loadData(successMessage = ''): void {
+    // Carga el libro y los prestamos juntos para mostrar estado, lector y acciones correctas.
     forkJoin({
       book: this.libraryService.getBook(this.id),
       loans: this.libraryService.getLoans()

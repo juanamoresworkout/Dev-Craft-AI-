@@ -23,6 +23,7 @@ export class BookCatalog implements OnInit {
   protected readonly error = signal('');
 
   protected readonly filteredBooks = computed(() => {
+    // Filtra en cliente por los campos que el usuario puede reconocer rapidamente.
     const term = this.searchText().trim().toLowerCase();
     return this.books().filter((book) =>
       !term ||
@@ -47,12 +48,14 @@ export class BookCatalog implements OnInit {
   }
 
   protected activeLoanFor(book: Book): Loan | undefined {
+    // Busca si el libro aparece dentro de algun prestamo que siga activo.
     return this.loans().find((loan) =>
       loan.estado === 'ACTIVO' && loan.libros.some((item) => item.id === book.id)
     );
   }
 
   protected rent(book: Book): void {
+    // Valida el dato minimo que necesita el backend para registrar el prestamo.
     const nombreLector = this.borrowerName().trim();
     if (!nombreLector) {
       this.error.set('Escribe el nombre del lector antes de alquilar.');
@@ -61,6 +64,7 @@ export class BookCatalog implements OnInit {
 
     this.actionBookId.set(book.id);
     this.error.set('');
+    // Tras prestar, recarga libros y prestamos para reflejar stock y estado actualizados.
     this.libraryService.rentBook(book.id, nombreLector)
       .pipe(finalize(() => this.actionBookId.set(null)))
       .subscribe({
@@ -70,6 +74,7 @@ export class BookCatalog implements OnInit {
   }
 
   protected returnBook(book: Book): void {
+    // La devolucion se hace sobre el prestamo activo, no directamente sobre el libro.
     const loan = this.activeLoanFor(book);
     if (!loan) {
       return;
@@ -87,6 +92,7 @@ export class BookCatalog implements OnInit {
 
   private loadData(successMessage = ''): void {
     this.loading.set(true);
+    // Carga catalogo y prestamos a la vez para pintar disponibilidad en una sola vista.
     forkJoin({
       books: this.libraryService.getBooks(),
       loans: this.libraryService.getLoans()

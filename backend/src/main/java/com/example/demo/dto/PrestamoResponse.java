@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+// Formato publico que devuelve la API para un prestamo y sus libros.
 public class PrestamoResponse {
 
     private Long id;
