@@ -27,6 +27,16 @@ export class LibraryService {
     return this.http.post<Book>(`${this.apiUrl}/libros`, request);
   }
 
+  updateBook(id: number, request: CreateBookRequest): Observable<Book> {
+    // Actualiza los datos editables de un libro existente.
+    return this.http.put<Book>(`${this.apiUrl}/libros/${id}`, request);
+  }
+
+  deleteBook(id: number): Observable<void> {
+    // Elimina un libro siempre que el backend permita borrarlo.
+    return this.http.delete<void>(`${this.apiUrl}/libros/${id}`);
+  }
+
   getLoans(): Observable<Loan[]> {
     // Consulta los prestamos para saber que libros estan prestados y a quien.
     return this.http.get<Loan[]>(`${this.apiUrl}/prestamos`);

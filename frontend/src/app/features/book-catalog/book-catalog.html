@@ -66,6 +66,7 @@
 
           <div class="actions">
             <a routerLink="/libros/{{ book.id }}">Detalle</a>
+            <a class="edit" routerLink="/libros/{{ book.id }}/editar">Editar</a>
             <button
               type="button"
               (click)="rent(book)"
@@ -78,6 +79,14 @@
                 Devolver
               </button>
             }
+            <button
+              class="danger"
+              type="button"
+              (click)="deleteBook(book)"
+              [disabled]="!!activeLoanFor(book) || actionBookId() === book.id"
+            >
+              Eliminar
+            </button>
           </div>
         </article>
       }
