@@ -2,8 +2,8 @@
   <a class="back" routerLink="/libros">Volver al catalogo</a>
 
   <div class="page-heading">
-    <p class="eyebrow">Nuevo libro</p>
-    <h1>Crear libro</h1>
+    <p class="eyebrow">{{ editing() ? 'Editar libro' : 'Nuevo libro' }}</p>
+    <h1>{{ editing() ? 'Actualizar libro' : 'Crear libro' }}</h1>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="submit()">
@@ -42,7 +42,7 @@
 
     <div class="actions">
       <button type="submit" [disabled]="saving()">
-        {{ saving() ? 'Guardando...' : 'Guardar libro' }}
+        {{ saving() ? 'Guardando...' : (editing() ? 'Actualizar libro' : 'Guardar libro') }}
       </button>
       <a routerLink="/libros">Cancelar</a>
     </div>

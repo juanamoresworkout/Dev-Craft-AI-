@@ -90,6 +90,18 @@ export class BookCatalog implements OnInit {
       });
   }
 
+  protected deleteBook(book: Book): void {
+    // El backend rechazara el borrado si el libro esta en un prestamo activo.
+    this.actionBookId.set(book.id);
+    this.error.set('');
+    this.libraryService.deleteBook(book.id)
+      .pipe(finalize(() => this.actionBookId.set(null)))
+      .subscribe({
+        next: () => this.loadData('Libro eliminado correctamente.'),
+        error: () => this.error.set('No se pudo eliminar el libro. Comprueba que no este prestado.')
+      });
+  }
+
   private loadData(successMessage = ''): void {
     this.loading.set(true);
     // Carga catalogo y prestamos a la vez para pintar disponibilidad en una sola vista.

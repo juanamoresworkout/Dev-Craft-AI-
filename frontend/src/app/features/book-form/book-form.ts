@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { LibraryService } from '../../core/services/library.service';
 
@@ -11,9 +11,10 @@ import { LibraryService } from '../../core/services/library.service';
   templateUrl: './book-form.html',
   styleUrl: './book-form.css'
 })
-export class BookForm {
+export class BookForm implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
 
+  protected readonly editing = signal(false);
   protected readonly saving = signal(false);
   protected readonly error = signal('');
 
@@ -26,8 +27,27 @@ export class BookForm {
 
   constructor(
     private readonly libraryService: LibraryService,
+    private readonly route: ActivatedRoute,
     private readonly router: Router
   ) {}
+
+  ngOnInit(): void {
+    const id = this.currentBookId();
+    if (!id) {
+      return;
+    }
+
+    this.editing.set(true);
+    this.libraryService.getBook(id).subscribe({
+      next: (book) => this.form.setValue({
+        titulo: book.titulo,
+        autor: book.autor,
+        isbn: book.isbn,
+        stock: book.stock
+      }),
+      error: () => this.error.set('No se pudo cargar el libro para editar.')
+    });
+  }
 
   protected submit(): void {
     // Fuerza la visualizacion de errores antes de enviar datos incompletos al backend.
@@ -39,13 +59,24 @@ export class BookForm {
 
     this.saving.set(true);
     this.error.set('');
-    // Si la creacion funciona, lleva al usuario directamente al detalle del nuevo libro.
-    this.libraryService.createBook(this.form.getRawValue()).subscribe({
+    const id = this.currentBookId();
+    const request = this.form.getRawValue();
+    const saveRequest = id
+      ? this.libraryService.updateBook(id, request)
+      : this.libraryService.createBook(request);
+
+    // Si el guardado funciona, lleva al usuario directamente al detalle del libro.
+    saveRequest.subscribe({
       next: (book) => this.router.navigate(['/libros', book.id]),
       error: () => {
         this.saving.set(false);
-        this.error.set('No se pudo crear el libro.');
+        this.error.set('No se pudo guardar el libro.');
       }
     });
+  }
+
+  private currentBookId(): number | null {
+    const value = this.route.snapshot.paramMap.get('id');
+    return value ? Number(value) : null;
   }
 }
