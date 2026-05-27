@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+// Datos minimos para registrar un prestamo desde la interfaz.
 public class PrestarRequest {
 
     @NotBlank

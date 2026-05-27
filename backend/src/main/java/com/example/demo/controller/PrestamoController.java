@@ -31,6 +31,7 @@ public class PrestamoController {
 
     @GetMapping
     public List<PrestamoResponse> listar() {
+        // Devuelve prestamos con sus libros en DTOs, evitando serializar entidades directamente.
         List<PrestamoResponse> respuestas = new ArrayList<PrestamoResponse>();
         for (Prestamo prestamo : prestamoService.listar()) {
             respuestas.add(toResponse(prestamo));
@@ -61,6 +62,7 @@ public class PrestamoController {
     }
 
     private PrestamoResponse toResponse(Prestamo prestamo) {
+        // Compone la respuesta completa del prestamo, incluyendo el resumen de cada libro asociado.
         PrestamoResponse response = new PrestamoResponse();
         response.setId(prestamo.getId());
         response.setNombreLector(prestamo.getNombreLector());

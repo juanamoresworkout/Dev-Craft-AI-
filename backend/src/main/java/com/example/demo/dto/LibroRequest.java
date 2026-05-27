@@ -4,6 +4,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+// Datos que acepta la API al crear o actualizar un libro.
 public class LibroRequest {
 
     @NotBlank

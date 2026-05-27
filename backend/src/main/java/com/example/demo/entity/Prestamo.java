@@ -32,6 +32,7 @@ public class Prestamo {
     @NotBlank
     private String estado;
 
+    // Se carga junto con el prestamo para poder construir respuestas JSON completas.
     @OneToMany(mappedBy = "prestamo", fetch = FetchType.EAGER)
     private List<Libro> libros = new ArrayList<Libro>();
 
